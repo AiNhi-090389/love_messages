@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Thông điệp cho người thương</title>
+  <style>
+    :root{--bg:#fff0f6;--card:#ffffff;--accent:#ff6b81;--text:#3b2b2b}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fff0f6 0%, #fff7f0 100%);color:var(--text)}
+    .card{width:clamp(300px,90vw,720px);padding:28px;border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,0.08);background:var(--card);text-align:center}
+    h1{margin:0 0 8px;font-size:1.6rem;color:var(--accent)}
+    p.msg{font-size:1.25rem;margin:12px 0 18px;white-space:pre-wrap}
+    .meta{font-size:0.9rem;color:#6b6b6b;margin-bottom:14px}
+    .actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+    .btn{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:600}
+    .small{background:transparent;border:1px solid #eee;padding:8px 12px;border-radius:10px;color:#555}
+    footer{font-size:0.8rem;color:#8a8a8a;margin-top:14px}
+    @media (prefers-reduced-motion:no-preference){h1{transform:translateY(-6px);animation:float 3s ease-in-out infinite}}
+    @keyframes float{0%,100%{transform:translateY(-6px)}50%{transform:translateY(0)}}
+  </style>
+</head>
+<body>
+  <div class="card" role="main" aria-label="Thông điệp">
+    <h1>Gửi tới người thương</h1>
+    <p class="msg" id="message">Một chút yêu thương dành cho bạn 💌</p>
+    <div class="meta" id="fromText">— từ người gửi bí mật</div>
+    <div class="actions">
+      <a id="shareBtn" class="btn" href="#">Chia sẻ liên kết này</a>
+      <button id="editBtn" class="small">Sửa thông điệp</button>
+    </div>
+    <footer>Gõ thông điệp vào ô bên dưới rồi nhấn Lưu để tạo link chia sẻ</footer>
+    <div style="margin-top:12px;">
+      <input id="inputMsg" type="text" placeholder="Viết lời nhắn..." style="width:100%;padding:10px;border-radius:10px;border:1px solid #eee;font-size:1rem" />
+      <input id="inputFrom" type="text" placeholder="Ký tên (ví dụ: Nhí)" style="width:100%;padding:10px;border-radius:10px;border:1px solid #eee;font-size:1rem;margin-top:8px" />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="saveBtn" class="btn" style="flex:1">Lưu và tạo link</button>
+        <button id="clearBtn" class="small" style="flex:1">Xóa</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const msg = params.get('m');
+    const from = params.get('f');
+    const messageEl = document.getElementById('message');
+    const fromEl = document.getElementById('fromText');
+    const inputMsg = document.getElementById('inputMsg');
+    const inputFrom = document.getElementById('inputFrom');
+    const shareBtn = document.getElementById('shareBtn');
+
+    function decodeSafe(s){ try { return decodeURIComponent(s.replace(/\+/g,' ')) } catch(e){ return s } }
+
+    if(msg){ messageEl.textContent = decodeSafe(msg) }
+    if(from){ fromEl.textContent = '— ' + decodeSafe(from) }
+
+    document.getElementById('saveBtn').addEventListener('click', ()=>{
+      const m = encodeURIComponent(inputMsg.value || messageEl.textContent);
+      const f = encodeURIComponent(inputFrom.value || '');
+      const url = location.origin + location.pathname + '?m=' + m + (f ? '&f=' + f : '');
+      shareBtn.href = url;
+      shareBtn.textContent = 'Mở liên kết';
+      try { navigator.clipboard.writeText(url) } catch(e){}
+      alert('Link đã được tạo và sao chép vào clipboard.');
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      inputMsg.value = '';
+      inputFrom.value = '';
+      messageEl.textContent = 'Một chút yêu thương dành cho bạn 💌';
+      fromEl.textContent = '— từ người gửi bí mật';
+      shareBtn.href = '#';
+      shareBtn.textContent = 'Chia sẻ liên kết này';
+    });
+
+    document.getElementById('editBtn').addEventListener('click', ()=> inputMsg.focus());
+  </script>
+</body>
+</html>
