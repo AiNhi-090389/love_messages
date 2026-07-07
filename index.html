@@ -54,6 +54,7 @@
 
     if(msg){ messageEl.textContent = decodeSafe(msg) }
     if(from){ fromEl.textContent = '— ' + decodeSafe(from) }
+    if(msg || from){ history.replaceState({}, document.title, location.pathname) }
 
     document.getElementById('saveBtn').addEventListener('click', ()=>{
       const m = encodeURIComponent(inputMsg.value || messageEl.textContent);
